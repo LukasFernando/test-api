@@ -22,16 +22,16 @@ def portability():
 def test_portability():
     public_key_string = decrypt_manager.get_key(decrypt_manager.path_to_public_key, key_str=True)
     public_key = quote_plus(public_key_string)
+    public_key = public_key.replace('-----BEGIN+PUBLIC+KEY-----', '').replace('-----END+PUBLIC+KEY-----', '')
     callback = 'http://localhost:5080/portability/show-data'
     return redirect(f'http://127.0.0.1:5000/portability/?callback={callback}&public_key={public_key}', code=302)
 
 
-@portability_bp.route('/show-data', methods=['GET'])
+@portability_bp.route('/show-data', methods=['POST'])
 def callback():
-    encrypt_data = request.args.get('data')
+    encrypt_data = request.form['data']
     decrypt_data = decrypt_manager.decrypt_data(encrypt_data)
     return {'encrypt data': encrypt_data, 'decrypt data': decrypt_data}
-
 
 app.register_blueprint(portability_bp)
 
